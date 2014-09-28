@@ -36,6 +36,12 @@ $ git clone https://igabriel@bitbucket.org/igabriel/pyhrapi.git
 
 ```
 
+Or you can use 
+
+```
+https://github.com/igabriel85/modaclouds-loadbalancer-controller
+```
+
 
 We used pip and virtualenv to install and run pyHrapi.
 
