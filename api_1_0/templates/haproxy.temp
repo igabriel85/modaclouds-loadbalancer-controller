@@ -1,0 +1,54 @@
+global
+  daemon
+  maxconn 4096
+  pidfile {{pid}}
+
+
+defaults
+  log global
+  log 127.0.0.1 local0
+  log 127.0.0.1 local1 notice
+  mode http
+  timeout connect 300000
+  timeout client 300000
+  timeout server 300000
+  maxconn 2000
+  option redispatch
+  retries 3
+  option httpclose
+  option httplog
+  option forwardfor
+  option httpchk HEAD / HTTP/1.0
+
+
+{%for k, v in gateway.iteritems()%}
+  frontend {{k}}
+    {%for e in v%}
+      bind {{e}}
+    {%endfor%}
+      mode http
+      option httpclose
+      option forwardfor
+      reqadd X-Forwarded-Proto:\ https
+      {%for c,t in default_back.iteritems()%}
+        {%if c == k%}
+      default_backend {{t}}
+        {%endif%}
+      {%endfor%}
+{%endfor%}
+
+
+
+{%for key, value in conf.iteritems()%}
+  backend {{key}}
+  balance {{value['policy']}}
+  {%for k,v in value['targets'].iteritems()%}
+    server {{k}}  weight {{v}} check cookie {{k.split(' ', 1)[0]}}
+
+  {%endfor%}
+{% endfor %}
+
+
+listen haproxyapp_admin:9100 *:9100
+  mode http
+  stats uri /status

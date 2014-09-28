@@ -1,0 +1,33 @@
+global
+  daemon
+  maxconn 4096
+  pidfile /Users/Gabriel/Documents/workspaces/pyHrapi/api_1_0/tmp/haproxy-queue.pid
+
+defaults
+  log global
+  log 127.0.0.1 local0
+  log 127.0.0.1 local1 notice
+  mode http
+  timeout connect 300000
+  timeout client 300000
+  timeout server 300000
+  maxconn 2000
+  option redispatch
+  retries 3
+  option httpclose
+  option httplog
+  option forwardfor
+  option httpchk HEAD / HTTP/1.0
+
+frontend http-farm
+  bind 127.0.0.1:9000
+  default_backend {{def_back}}
+
+backend {{def_back}}
+  balance {{method}}
+  server {{server_alias}} {{server_address}} check
+
+
+listen haproxyapp_admin:9100 127.0.0.1:9100
+  mode http
+  stats uri /stats

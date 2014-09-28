@@ -1,0 +1,3 @@
+listen haproxyapp_admin:9100 *:9100
+  mode http
+  stats uri /status

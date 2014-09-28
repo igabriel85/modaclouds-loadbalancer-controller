@@ -1,0 +1,135 @@
+=============================================
+                Gateways
+=============================================
+<gateway-descriptor> ::= {
+    "protocol" : <gateway-protocol>,
+    "endpoints" : {
+        <alias> : <entity-identifier> *,
+    },
+    "pools" : {
+        <alias> : <entity-identifier> *,
+    },
+    "enabled" : <boolean>,
+    @<annotation-attribute> ?,
+    @<standalone-entity-attributes>,
+}
+
+<gateway-protocol> ::= ("http" | "tcp")
+
+
+
+<gateway-endpoint> ::= {
+    "address" : <endpoint-address>,
+    @<annotation-attribute> ?,
+    @<standalone-entity-attributes>,
+}
+
+=============================================
+                Pools
+=============================================
+
+<pool-descriptor> ::= {
+    "targets" : {
+        <alias> : <entity-identifier> *,
+    },
+    "enabled" : <boolean>,
+    @<annotation-attribute> ?,
+    @<standalone-entity-attributes>,
+}
+
+<target-descriptor> ::= {
+    "endpoint" : {
+        "address" : <endpoint-address>,
+    }
+    "enabled" : <boolean>,
+    "classes" : [ <target-class> *, ],
+    "maximum-outstanding-transactions" : (<positive-integer> | 0),
+    @<annotation-attribute> ?,
+    @<standalone-entity-attributes>,
+}
+
+// FIXME: Provide a regular expression!
+<target-class> ::= <string>
+
+
+=============================================
+                Policy
+=============================================
+
+
+
+<policy-descriptor> ::= (
+        <round-robin-policy-descriptor> |
+        <least-connections-policy-descriptor> |
+        <backfill-policy-descriptor>
+)
+
+<round-robin-policy-descriptor> ::= {
+    "weights" : {
+        <policy-selector> : <float(0,1)> *,
+    }
+    @<annotation-attribute> ?,
+    @<standalone-entity-attributes>,
+}
+
+<least-connections-policy-descriptor> ::= {
+    "weights" : {
+        <policy-selector> : <float(0,1)> *,
+    }
+    @<annotation-attribute> ?,
+    @<standalone-entity-attributes>,
+}
+
+<backfill-policy-descriptor> ::= {
+    "priority" : {
+        <policy-selector> : <float(0,1)> *,
+    }
+    @<annotation-attribute> ?,
+    @<standalone-entity-attributes>,
+}
+
+// FIXME: Provide regular expressions!
+<policy-selector> ::= (<policy-target-selector> | <policy-class-selector> | <policy-default-selector>)
+<policy-target-selector> ::= ...
+<policy-class-selector> ::= ...
+<policy-default-selector> ::= ...
+
+
+=============================================
+                Generic
+=============================================
+
+// FIXME: Provide a regular expression!
+<alias> ::= <string>
+
+<endpoint-address> ::= ("tcp:" + <ip-address> + ":" + <ip-port>)
+
+// FIXME: Provide regular expressions!
+<ip-address> ::= <ipv4-address> | <ipv6-address>
+<ipv4-address> ::= ...
+<ipv6-address> ::= ...
+
+<ip-port> ::= <integer(1, 65535)>
+
+<selfdescribing-entity-attributes> ::= {
+    "_schema" : <schema-identifier>,
+    "_schema/version" : <schema-version>,
+}
+
+<standalone-entity-attributes> ::= {
+    @<selfdescribing-entity-attributes>,
+    "_identifier" : <entity-identifier>,
+    "_revision" : <entity-revision>,
+    "_revision/previous" : (<entity-revision> | null)?,
+    "_revision/originator" : (<url> | null)?,
+}
+
+// FIXME: Provide regular expressions!
+<schema-identifier> ::= ...
+<schema-version> ::= ...
+<entity-identifier> ::= ...
+<entity-revision> ::= ...
+
+// FIXME: Provide a regular expression!
+<url> ::= ...
+
