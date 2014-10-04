@@ -64,7 +64,7 @@ portGen = '90'+str(random.randint(10,99))
 conf_name = '/haproxy'+str(idGen)+'.conf'
 pid_name = '/haproxy-'+str(idGen)+'.pid'
 
-gPID = '0'
+
 
 # Need to create temporary file for pid use tempfile
 
@@ -1260,7 +1260,7 @@ return response
 
 if __name__ == '__main__':
     # db.create_all()
-    checkOrf()
+    #checkOrf()
         if len(sys.argv) == 1:
             app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///'+os.path.join(tmp_loc,'test.db')
                 db.create_all()

@@ -1,5 +1,5 @@
 # pyHrapi
- 
+
 
 pyHrapi  is a RESTFul API for  [HaProxy](http://www.haproxy.org/) load balancer. It is created for the [MODAClouds](www.modaclouds.eu) project. It stands for python Haproxy RESTFul API.
 
@@ -35,8 +35,7 @@ In order to clone the repository create or go to a directory of your choosing an
 $ git clone https://igabriel@bitbucket.org/igabriel/pyhrapi.git
 
 ```
-
-Or you can use 
+Or you can use
 
 ```
 https://github.com/igabriel85/modaclouds-loadbalancer-controller
@@ -85,9 +84,10 @@ The file `requirements.txt` can be found in the repository and contains a list o
 In order to start pyHrapi we must enter the following command
 
 ```
-(henv)..$ python pyprox.py 179.12.12.1 5000
+(henv)..$ python pyprox.py <ip-address> <port> <db name> 
 
 ```
+
 
 If no host is given pyHrapi uses localhome on port 5000.
 
@@ -101,13 +101,13 @@ HaProxy Frontend
 `GET` `/v1/gateways`
 
 a list of identifiers for the defined gateways; (i.e. the response body is a JSON list containing strings;)
-```
+```json
 {
-  "Gateways": [
-    "gatewayHTTP", 
-    "gatewayTCP", 
-    "gatewayHTTPS" 
-  ]
+"Gateways": [
+"gatewayHTTP", 
+"gatewayTCP", 
+"gatewayHTTPS" 
+]
 }
 
 ```
@@ -116,25 +116,25 @@ a list of identifiers for the defined gateways; (i.e. the response body is a JSO
 
 obtain the definition document for a particular gateway (identified by the token {gateway}); the response body is a <gateway-descriptor>;
 
-```
+```json
 {
-  "endpoints": {
-    "EndpointFive": "11.0.0.5", 
-    "EndpointFour": "11.0.0.4", 
-    "EndpointThree": "11.0.0.3", 
-    "EndpointTwo": "11.0.0.2"
-  }, 
-  "gateway": "gatewayHTTP", 
-  "pools": [
-    "testPool1", 
-    "testPool2", 
-    "testPool3", 
-    "testPool4", 
-    "testPool5", 
-    "testPool6", 
-    "testPool7" 
-  ], 
-  "protocol": "http"
+"endpoints": {
+"EndpointFive": "11.0.0.5", 
+"EndpointFour": "11.0.0.4", 
+"EndpointThree": "11.0.0.3", 
+"EndpointTwo": "11.0.0.2"
+}, 
+"gateway": "gatewayHTTP", 
+"pools": [
+"testPool1", 
+"testPool2", 
+"testPool3", 
+"testPool4", 
+"testPool5", 
+"testPool6", 
+"testPool7" 
+], 
+"protocol": "http"
 }
 
 ```
@@ -143,22 +143,22 @@ obtain the definition document for a particular gateway (identified by the token
 
 create a new gateway (identified by the token {gateway}), or update an existing gateway in case one exists with the given identifier; the request body is a <gateway-descriptor>;
 
-```
+```json
 
 {
-  "gateway": "testPut",
-  "protocol": "http",
-  "endpoints": 
-    {
-      "endPutOne": "123.123.123.123:80",
-      "endPutTwo":"123.123.123.124:80"
-    },
-    "pools":
-    {
-    	"poolPutG1": "1.1.1.1:80",
-    	"poolPutG2": "1.1.1.2:80"
-    },
-  "enable": "True"
+"gateway": "testPut",
+"protocol": "http",
+"endpoints": 
+{
+"endPutOne": "123.123.123.123:80",
+"endPutTwo":"123.123.123.124:80"
+},
+"pools":
+{
+"poolPutG1": "1.1.1.1:80",
+"poolPutG2": "1.1.1.2:80"
+},
+"enable": "True"
 }
 
 ```
@@ -166,22 +166,22 @@ create a new gateway (identified by the token {gateway}), or update an existing 
 Currently pool usage in the context of gateways is broken. Thus it can be ommited in the above json when submitting gateways.
 Also it is possible to define the default pool (backend) for a given frontend (gateway).
 
-```
+```json
 {
-  "gateway": "testPut",
-  "protocol": "http",
-  "endpoints": 
-    {
-      "endPutOne": "123.123.123.123:80",
-      "endPutTwo":"123.123.123.124:80"
-    },
-    "pools":
-    {
-    	"poolPutG1": "1.1.1.1:80",
-    	"poolPutG2": "1.1.1.2:80"
-    },
-  "enable": "True",
-  "defaultBack":<backend_id>
+"gateway": "testPut",
+"protocol": "http",
+"endpoints": 
+{
+"endPutOne": "123.123.123.123:80",
+"endPutTwo":"123.123.123.124:80"
+},
+"pools":
+{
+"poolPutG1": "1.1.1.1:80",
+"poolPutG2": "1.1.1.2:80"
+},
+"enable": "True",
+"defaultBack":<backend_id>
 }
 
 ```
@@ -196,15 +196,15 @@ Deletes the designated gateway; Currently only deletes gateway (db_hrapy) and no
 `GET` `/v1/gateways/{gateway}/endpoints`
 
 a list of identifiers for all the gateway's endpoints;
-```
+```json
 {
-  "Endpoints": [
-    "EndpointThree", 
-    "EndpointFive", 
-    "EndpointTwo", 
-    "EndpointFour"
-  ], 
-  "Gateway": "gatewayHTTP"
+"Endpoints": [
+"EndpointThree", 
+"EndpointFive", 
+"EndpointTwo", 
+"EndpointFour"
+], 
+"Gateway": "gatewayHTTP"
 }
 
 ```
@@ -213,18 +213,18 @@ a list of identifiers for all the gateway's endpoints;
 
 Displays only the address of the endpoint.
 
-```
+```json
 {
-  "address": "11.0.0.2:80"
+"address": "11.0.0.2:80"
 }
 ```
 `PUT` `/v1/gateways/{gateway}/endpoints/{endpoint}`
 
 This creates or modifies a given gateway endpoint:
 
-```
+```json
 {
-  "address": "12.0.0.22:80"
+"address": "12.0.0.22:80"
 }
 ```
 
@@ -237,18 +237,18 @@ This deletes the given endpoint.
 
 A list of aliases for all the associated pools;
 
-```
+```json
 {
-  "Pools": [
-    "testPool3", 
-    "testPool2", 
-    "testPool5", 
-    "testPool6", 
-    "testPool7", 
-    "testPool3", 
-    "testPool39", 
-    "poolPutG2"
-  ]
+"Pools": [
+"testPool3", 
+"testPool2", 
+"testPool5", 
+"testPool6", 
+"testPool7", 
+"testPool3", 
+"testPool39", 
+"poolPutG2"
+]
 }
 ```
 
@@ -274,19 +274,19 @@ HaProxy Backends
 
 Creates a json containing the list of all pools
 
-```
+```json
 {
-  "Pools": [
-    "testPool1", 
-    "testPool2", 
-    "testPool3", 
-    "testPool4", 
-    "testPool5", 
-    "testPool6", 
-    "testPool7", 
-    "testPool8", 
-    "testPool9" 
-  ]
+"Pools": [
+"testPool1", 
+"testPool2", 
+"testPool3", 
+"testPool4", 
+"testPool5", 
+"testPool6", 
+"testPool7", 
+"testPool8", 
+"testPool9" 
+]
 }
 ```
 
@@ -294,19 +294,19 @@ Creates a json containing the list of all pools
 
 Returns the pool descriptor of a specific pool member.
 
-```
+```json
 {
-  "enabled": true, 
-  "targets": {
-    "targetFive": "10.0.0.5:80", 
-    "targetFour": "10.0.0.4:443", 
-    "targetOne": "10.0.0.1:8080", 
-    "targetSix": "10.0.0.6:8080", 
-    "targetTestCLI": "1.2.3.4.5:5000", 
-    "targetThree": "10.0.0.3:8080", 
-    "targetThreeNew": "127.3.4.5:8080", 
-    "targetTwo": "10.0.0.2:80"
-  }
+"enabled": true, 
+"targets": {
+"targetFive": "10.0.0.5:80", 
+"targetFour": "10.0.0.4:443", 
+"targetOne": "10.0.0.1:8080", 
+"targetSix": "10.0.0.6:8080", 
+"targetTestCLI": "1.2.3.4.5:5000", 
+"targetThree": "10.0.0.3:8080", 
+"targetThreeNew": "127.3.4.5:8080", 
+"targetTwo": "10.0.0.2:80"
+}
 }
 ```
 
@@ -314,17 +314,17 @@ Returns the pool descriptor of a specific pool member.
 
 Creates or modifies a specific pool member.
 
-```
+```json
 {
-  "enabled": true,
-  "targets": {
-    "targetT7": "12.1.0.5:80", 
-    "targetT8": "12.1.0.4:8080", 
-    "targetT9": "12.1.0.1:443", 
-    "targetT10": "12.1.0.6:442", 
-    "targetT11": "12.1.3.4:80", 
-    "targetT12": "12.1.0.3:80"
-  }
+"enabled": true,
+"targets": {
+"targetT7": "12.1.0.5:80", 
+"targetT8": "12.1.0.4:8080", 
+"targetT9": "12.1.0.1:443", 
+"targetT10": "12.1.0.6:442", 
+"targetT11": "12.1.3.4:80", 
+"targetT12": "12.1.0.3:80"
+}
 }
 ```
 
@@ -339,18 +339,18 @@ Deletes a specific pool.
 
 Returns a json containing the list of all target aliases.
 
-```
+```json
 {
-  "Targets": [
-    "targetFour", 
-    "targetSix", 
-    "targetTwo", 
-    "targetFive", 
-    "targetThree", 
-    "targetOne", 
-    "targetTestCLI", 
-    "targetThreeNew"
-  ]
+"Targets": [
+"targetFour", 
+"targetSix", 
+"targetTwo", 
+"targetFive", 
+"targetThree", 
+"targetOne", 
+"targetTestCLI", 
+"targetThreeNew"
+]
 }
 ```
 
@@ -358,11 +358,11 @@ Returns a json containing the list of all target aliases.
 
 Returns a json containing a the target associated with a pool.
 
-```
+```json
 {
-  "address": "10.0.0.6:80",
-  "weight" : 220,
-  "enabled": true
+"address": "10.0.0.6:80",
+"weight" : 220,
+"enabled": true
 }
 ```
 
@@ -370,11 +370,11 @@ Returns a json containing a the target associated with a pool.
 
 Creates or modifies a target associated with a pool.
 
-```
+```json
 {
-  "address": "10.0.1.6:80",
-  "weight": 12, 
-  "enabled": false
+"address": "10.0.1.6:80",
+"weight": 12, 
+"enabled": false
 }
 ```
 
@@ -392,10 +392,10 @@ Deletes the target from a specified pool.
 
 Obtain the policy of the designated pool; the response body is either the JSON null value in case no policy exists, or a <policy>;
 As well as its default weight.
-```
+```json
 {
-  "policy": "roundrobin", 
-  "weights": 1.0
+"policy": "roundrobin", 
+"weights": 1.0
 }
 ```
 
@@ -404,10 +404,10 @@ As well as its default weight.
 
 Updates the policy of the designated pool; (by using the JSON null value the same effect as DELETE is obtained;)
 
-```
+```json
 {
-  "policy": "roundrobin", 
-  "weights": 2.0
+"policy": "roundrobin", 
+"weights": 2.0
 }
 ```
 
@@ -439,7 +439,7 @@ Imports an sql database and loads that as the default. The request data is the d
 `GET` `/v1/controller/_export-cdb`
 
 Currently not implemented. Scheduled for the next version.
-   
+
 
 
 # Getting Started - Example
@@ -448,7 +448,7 @@ First we need to use the virtualenvironment previously created. Once this is don
 
 
 ```
-(henv)..$python pyprox.py <host> <port>
+(henv)..$python pyprox.py <host> <port> <db name>
 
 ```
 
@@ -460,14 +460,14 @@ We can define the gateway and its endpoint using a json like this:
 
 ```json
 {
-  "gateway": "gateHTTP",
-  "protocol": "http",
-  "endpoints": 
-    {
-      "endOne": "173.13.23.11:80",
-      "endTwo":"13.23.76.14:8080"
-    },
-  "enable": "True"
+"gateway": "gateHTTP",
+"protocol": "http",
+"endpoints": 
+{
+"endOne": "173.13.23.11:80",
+"endTwo":"13.23.76.14:8080"
+},
+"enable": "True"
 }
 
 ```
@@ -475,31 +475,31 @@ This json has to be used with the resource `/v1/gateways/gateHTTP` using the `PU
 
 Once this is done we can create the two backends using pool resources:
 
-```
+```json
 {
-  "enabled": true,
-  "targets": {
-    "targetS1": "12.1.0.5:80", 
-    "targetS2": "12.1.0.4:8080", 
-    "targetS4": "12.1.0.1:443", 
-    "targetS5": "12.1.0.6:442", 
-    "targetS6": "12.1.3.4:80", 
-    "targetS7": "12.1.0.3:80"
-  }
+"enabled": true,
+"targets": {
+"targetS1": "12.1.0.5:80", 
+"targetS2": "12.1.0.4:8080", 
+"targetS4": "12.1.0.1:443", 
+"targetS5": "12.1.0.6:442", 
+"targetS6": "12.1.3.4:80", 
+"targetS7": "12.1.0.3:80"
+}
 }
 ```
 Lets call this pool/backend `eta` and has the URI `/v1/pools/eta`
 
 The second pool/gateway is defined by:
 
-```
+```json
 {
-  "enabled": true,
-  "targets": {
-    "targetT1": "172.1.0.5:80", 
-    "targetT2": "172.1.0.4:8080", 
-    "targetT3": "172.1.0.1:443"
-  }
+"enabled": true,
+"targets": {
+"targetT1": "172.1.0.5:80", 
+"targetT2": "172.1.0.4:8080", 
+"targetT3": "172.1.0.1:443"
+}
 }
 ```
 We can call this pool/backend `theta` and has the URI `/v1/pools/theta`
@@ -508,11 +508,11 @@ Now we can modify the individual weights of each target by accessing the resourc
 
 `/v1/pools/eta/targets/targetS1`
 
-```
+```json
 {
-  "address": "12.1.0.5:80", 
-  "weight": 200,
-  "enabled": true
+"address": "12.1.0.5:80", 
+"weight": 200,
+"enabled": true
 }
 ```
 
@@ -520,11 +520,28 @@ After the weights are adjusted Haproxy can be started with the resourceusing `PO
 
 `/v1/controller/commit`
 
+After a succesfull  
+
+When Haproxy starts pyHrapi responds with:
+
+```json
+{
+"HaProxy Status": "Started",
+"Listen Port": "9029"
+}
+
+```
+
+The listenPort refers to Haproxy status interface which can be accessed at:
+
+```
+<host>:<listenPort>/status
+```
 
 ##Note
 
 In the configuration folder the config file used to start haproxy is stored. This is not necessary, it is only stored in file form for debugging purposes.
-All configurations are stored in the sqlite database.
+All configurations are also stored in the sqlite database.
 
 
 
@@ -535,12 +552,12 @@ Notice
 ======
 
 Copyright 2014, Institute e-Austria, Timisoara, Romania
-    http://www.ieat.ro/
+http://www.ieat.ro/
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at:
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
