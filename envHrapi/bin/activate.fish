@@ -32,7 +32,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/Gabriel/Documents/workspaces/pyHrapi/envHrapi"
+set -gx VIRTUAL_ENV "/home/gabriel/Repositories/envHrapi"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH
