@@ -91,7 +91,18 @@ In order to start pyHrapi we must enter the following command
 
 If no host is given pyHrapi uses localhome on port 5000.
 
+If you want to use the provided virtualenv you can start it using the provided bash script:
 
+```
+...$ ./start-mlbc.sh
+```
+or
+
+```
+...$./start-mlbc.sh <ip-address> <port> <db name> 
+```
+
+It is important to note that because makin virtualenv relocatable is still experimental we have preconfigured environments for MacOS X 10.9 and openSUSE 13.1 (both 32 and 64 bits).
 
 ##Usage 
 ### Gateways
