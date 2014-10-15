@@ -1,5 +1,5 @@
 # pyHrapi
-
+ 
 
 pyHrapi  is a RESTFul API for  [HaProxy](http://www.haproxy.org/) load balancer. It is created for the [MODAClouds](www.modaclouds.eu) project. It stands for python Haproxy RESTFul API.
 
@@ -90,7 +90,6 @@ In order to start pyHrapi we must enter the following command
 
 
 If no host is given pyHrapi uses localhome on port 5000.
-
 If you want to use the provided virtualenv you can start it using the provided bash script:
 
 ```
@@ -104,6 +103,7 @@ or
 
 It is important to note that because makin virtualenv relocatable is still experimental we have preconfigured environments for MacOS X 10.9 and openSUSE 13.1 (both 32 and 64 bits).
 
+
 ##Usage 
 ### Gateways
 
@@ -114,11 +114,11 @@ HaProxy Frontend
 a list of identifiers for the defined gateways; (i.e. the response body is a JSON list containing strings;)
 ```json
 {
-"Gateways": [
-"gatewayHTTP", 
-"gatewayTCP", 
-"gatewayHTTPS" 
-]
+  "Gateways": [
+    "gatewayHTTP", 
+    "gatewayTCP", 
+    "gatewayHTTPS" 
+  ]
 }
 
 ```
@@ -129,23 +129,23 @@ obtain the definition document for a particular gateway (identified by the token
 
 ```json
 {
-"endpoints": {
-"EndpointFive": "11.0.0.5", 
-"EndpointFour": "11.0.0.4", 
-"EndpointThree": "11.0.0.3", 
-"EndpointTwo": "11.0.0.2"
-}, 
-"gateway": "gatewayHTTP", 
-"pools": [
-"testPool1", 
-"testPool2", 
-"testPool3", 
-"testPool4", 
-"testPool5", 
-"testPool6", 
-"testPool7" 
-], 
-"protocol": "http"
+  "endpoints": {
+    "EndpointFive": "11.0.0.5", 
+    "EndpointFour": "11.0.0.4", 
+    "EndpointThree": "11.0.0.3", 
+    "EndpointTwo": "11.0.0.2"
+  }, 
+  "gateway": "gatewayHTTP", 
+  "pools": [
+    "testPool1", 
+    "testPool2", 
+    "testPool3", 
+    "testPool4", 
+    "testPool5", 
+    "testPool6", 
+    "testPool7" 
+  ], 
+  "protocol": "http"
 }
 
 ```
@@ -157,19 +157,19 @@ create a new gateway (identified by the token {gateway}), or update an existing 
 ```json
 
 {
-"gateway": "testPut",
-"protocol": "http",
-"endpoints": 
-{
-"endPutOne": "123.123.123.123:80",
-"endPutTwo":"123.123.123.124:80"
-},
-"pools":
-{
-"poolPutG1": "1.1.1.1:80",
-"poolPutG2": "1.1.1.2:80"
-},
-"enable": "True"
+  "gateway": "testPut",
+  "protocol": "http",
+  "endpoints": 
+    {
+      "endPutOne": "123.123.123.123:80",
+      "endPutTwo":"123.123.123.124:80"
+    },
+    "pools":
+    {
+    	"poolPutG1": "1.1.1.1:80",
+    	"poolPutG2": "1.1.1.2:80"
+    },
+  "enable": "True"
 }
 
 ```
@@ -179,20 +179,20 @@ Also it is possible to define the default pool (backend) for a given frontend (g
 
 ```json
 {
-"gateway": "testPut",
-"protocol": "http",
-"endpoints": 
-{
-"endPutOne": "123.123.123.123:80",
-"endPutTwo":"123.123.123.124:80"
-},
-"pools":
-{
-"poolPutG1": "1.1.1.1:80",
-"poolPutG2": "1.1.1.2:80"
-},
-"enable": "True",
-"defaultBack":<backend_id>
+  "gateway": "testPut",
+  "protocol": "http",
+  "endpoints": 
+    {
+      "endPutOne": "123.123.123.123:80",
+      "endPutTwo":"123.123.123.124:80"
+    },
+    "pools":
+    {
+    	"poolPutG1": "1.1.1.1:80",
+    	"poolPutG2": "1.1.1.2:80"
+    },
+  "enable": "True",
+  "defaultBack":<backend_id>
 }
 
 ```
@@ -209,13 +209,13 @@ Deletes the designated gateway; Currently only deletes gateway (db_hrapy) and no
 a list of identifiers for all the gateway's endpoints;
 ```json
 {
-"Endpoints": [
-"EndpointThree", 
-"EndpointFive", 
-"EndpointTwo", 
-"EndpointFour"
-], 
-"Gateway": "gatewayHTTP"
+  "Endpoints": [
+    "EndpointThree", 
+    "EndpointFive", 
+    "EndpointTwo", 
+    "EndpointFour"
+  ], 
+  "Gateway": "gatewayHTTP"
 }
 
 ```
@@ -226,7 +226,7 @@ Displays only the address of the endpoint.
 
 ```json
 {
-"address": "11.0.0.2:80"
+  "address": "11.0.0.2:80"
 }
 ```
 `PUT` `/v1/gateways/{gateway}/endpoints/{endpoint}`
@@ -235,7 +235,7 @@ This creates or modifies a given gateway endpoint:
 
 ```json
 {
-"address": "12.0.0.22:80"
+  "address": "12.0.0.22:80"
 }
 ```
 
@@ -250,16 +250,16 @@ A list of aliases for all the associated pools;
 
 ```json
 {
-"Pools": [
-"testPool3", 
-"testPool2", 
-"testPool5", 
-"testPool6", 
-"testPool7", 
-"testPool3", 
-"testPool39", 
-"poolPutG2"
-]
+  "Pools": [
+    "testPool3", 
+    "testPool2", 
+    "testPool5", 
+    "testPool6", 
+    "testPool7", 
+    "testPool3", 
+    "testPool39", 
+    "poolPutG2"
+  ]
 }
 ```
 
@@ -287,17 +287,17 @@ Creates a json containing the list of all pools
 
 ```json
 {
-"Pools": [
-"testPool1", 
-"testPool2", 
-"testPool3", 
-"testPool4", 
-"testPool5", 
-"testPool6", 
-"testPool7", 
-"testPool8", 
-"testPool9" 
-]
+  "Pools": [
+    "testPool1", 
+    "testPool2", 
+    "testPool3", 
+    "testPool4", 
+    "testPool5", 
+    "testPool6", 
+    "testPool7", 
+    "testPool8", 
+    "testPool9" 
+  ]
 }
 ```
 
@@ -307,17 +307,17 @@ Returns the pool descriptor of a specific pool member.
 
 ```json
 {
-"enabled": true, 
-"targets": {
-"targetFive": "10.0.0.5:80", 
-"targetFour": "10.0.0.4:443", 
-"targetOne": "10.0.0.1:8080", 
-"targetSix": "10.0.0.6:8080", 
-"targetTestCLI": "1.2.3.4.5:5000", 
-"targetThree": "10.0.0.3:8080", 
-"targetThreeNew": "127.3.4.5:8080", 
-"targetTwo": "10.0.0.2:80"
-}
+  "enabled": true, 
+  "targets": {
+    "targetFive": "10.0.0.5:80", 
+    "targetFour": "10.0.0.4:443", 
+    "targetOne": "10.0.0.1:8080", 
+    "targetSix": "10.0.0.6:8080", 
+    "targetTestCLI": "1.2.3.4.5:5000", 
+    "targetThree": "10.0.0.3:8080", 
+    "targetThreeNew": "127.3.4.5:8080", 
+    "targetTwo": "10.0.0.2:80"
+  }
 }
 ```
 
@@ -327,15 +327,15 @@ Creates or modifies a specific pool member.
 
 ```json
 {
-"enabled": true,
-"targets": {
-"targetT7": "12.1.0.5:80", 
-"targetT8": "12.1.0.4:8080", 
-"targetT9": "12.1.0.1:443", 
-"targetT10": "12.1.0.6:442", 
-"targetT11": "12.1.3.4:80", 
-"targetT12": "12.1.0.3:80"
-}
+  "enabled": true,
+  "targets": {
+    "targetT7": "12.1.0.5:80", 
+    "targetT8": "12.1.0.4:8080", 
+    "targetT9": "12.1.0.1:443", 
+    "targetT10": "12.1.0.6:442", 
+    "targetT11": "12.1.3.4:80", 
+    "targetT12": "12.1.0.3:80"
+  }
 }
 ```
 
@@ -352,16 +352,16 @@ Returns a json containing the list of all target aliases.
 
 ```json
 {
-"Targets": [
-"targetFour", 
-"targetSix", 
-"targetTwo", 
-"targetFive", 
-"targetThree", 
-"targetOne", 
-"targetTestCLI", 
-"targetThreeNew"
-]
+  "Targets": [
+    "targetFour", 
+    "targetSix", 
+    "targetTwo", 
+    "targetFive", 
+    "targetThree", 
+    "targetOne", 
+    "targetTestCLI", 
+    "targetThreeNew"
+  ]
 }
 ```
 
@@ -371,9 +371,9 @@ Returns a json containing a the target associated with a pool.
 
 ```json
 {
-"address": "10.0.0.6:80",
-"weight" : 220,
-"enabled": true
+  "address": "10.0.0.6:80",
+  "weight" : 220,
+  "enabled": true
 }
 ```
 
@@ -383,9 +383,9 @@ Creates or modifies a target associated with a pool.
 
 ```json
 {
-"address": "10.0.1.6:80",
-"weight": 12, 
-"enabled": false
+  "address": "10.0.1.6:80",
+  "weight": 12, 
+  "enabled": false
 }
 ```
 
@@ -405,8 +405,8 @@ Obtain the policy of the designated pool; the response body is either the JSON n
 As well as its default weight.
 ```json
 {
-"policy": "roundrobin", 
-"weights": 1.0
+  "policy": "roundrobin", 
+  "weights": 1.0
 }
 ```
 
@@ -417,8 +417,8 @@ Updates the policy of the designated pool; (by using the JSON null value the sam
 
 ```json
 {
-"policy": "roundrobin", 
-"weights": 2.0
+  "policy": "roundrobin", 
+  "weights": 2.0
 }
 ```
 
@@ -428,6 +428,32 @@ Reset the policy of the designated pool to a default value;
 
 It is important to note that all names and aliases of gateways, endpoints, targets and pools are considered unique.
 Thus, no duplicate names are allowed. Further more all jsons are case sensitive.
+
+`GET` `/v1/pools/{pool}/targets/{target}/check`
+
+Checks if a target is online or not. If the target is online it returns:
+
+```json
+{   
+    "Target": <target_id>,
+    "Host": <host-ip>,
+    "Port": <port>,
+    "Status": "Online"
+}
+```
+It the target/service is offline it returns:
+
+```json
+{   
+    "Target": <target_id>,
+    "Host": <host-ip>,
+    "Port": <port>,
+    "Status": "Offline"
+}
+```
+
+It is important to note that once a target is determined to be offline it is flagged as disabled and not included into the new configuration file loaded into Haproxy.
+The new configuration is not automatically loaded.
 
 ## Starting Haproxy
 
@@ -450,7 +476,7 @@ Imports an sql database and loads that as the default. The request data is the d
 `GET` `/v1/controller/_export-cdb`
 
 Currently not implemented. Scheduled for the next version.
-
+   
 
 
 # Getting Started - Example
@@ -471,14 +497,14 @@ We can define the gateway and its endpoint using a json like this:
 
 ```json
 {
-"gateway": "gateHTTP",
-"protocol": "http",
-"endpoints": 
-{
-"endOne": "173.13.23.11:80",
-"endTwo":"13.23.76.14:8080"
-},
-"enable": "True"
+  "gateway": "gateHTTP",
+  "protocol": "http",
+  "endpoints": 
+    {
+      "endOne": "173.13.23.11:80",
+      "endTwo":"13.23.76.14:8080"
+    },
+  "enable": "True"
 }
 
 ```
@@ -488,15 +514,15 @@ Once this is done we can create the two backends using pool resources:
 
 ```json
 {
-"enabled": true,
-"targets": {
-"targetS1": "12.1.0.5:80", 
-"targetS2": "12.1.0.4:8080", 
-"targetS4": "12.1.0.1:443", 
-"targetS5": "12.1.0.6:442", 
-"targetS6": "12.1.3.4:80", 
-"targetS7": "12.1.0.3:80"
-}
+  "enabled": true,
+  "targets": {
+    "targetS1": "12.1.0.5:80", 
+    "targetS2": "12.1.0.4:8080", 
+    "targetS4": "12.1.0.1:443", 
+    "targetS5": "12.1.0.6:442", 
+    "targetS6": "12.1.3.4:80", 
+    "targetS7": "12.1.0.3:80"
+  }
 }
 ```
 Lets call this pool/backend `eta` and has the URI `/v1/pools/eta`
@@ -505,12 +531,12 @@ The second pool/gateway is defined by:
 
 ```json
 {
-"enabled": true,
-"targets": {
-"targetT1": "172.1.0.5:80", 
-"targetT2": "172.1.0.4:8080", 
-"targetT3": "172.1.0.1:443"
-}
+  "enabled": true,
+  "targets": {
+    "targetT1": "172.1.0.5:80", 
+    "targetT2": "172.1.0.4:8080", 
+    "targetT3": "172.1.0.1:443"
+  }
 }
 ```
 We can call this pool/backend `theta` and has the URI `/v1/pools/theta`
@@ -521,9 +547,9 @@ Now we can modify the individual weights of each target by accessing the resourc
 
 ```json
 {
-"address": "12.1.0.5:80", 
-"weight": 200,
-"enabled": true
+  "address": "12.1.0.5:80", 
+  "weight": 200,
+  "enabled": true
 }
 ```
 
@@ -537,8 +563,8 @@ When Haproxy starts pyHrapi responds with:
 
 ```json
 {
-"HaProxy Status": "Started",
-"Listen Port": "9029"
+    "HaProxy Status": "Started",
+    "Listen Port": "9029"
 }
 
 ```
@@ -552,7 +578,8 @@ The listenPort refers to Haproxy status interface which can be accessed at:
 ##Note
 
 In the configuration folder the config file used to start haproxy is stored. This is not necessary, it is only stored in file form for debugging purposes.
-All configurations are also stored in the sqlite database.
+All configurations are also stored in the sqlite database. All files are stored into the OS's temporary directory (see: $TMPDIR environmental variable).
+
 
 
 
@@ -563,12 +590,12 @@ Notice
 ======
 
 Copyright 2014, Institute e-Austria, Timisoara, Romania
-http://www.ieat.ro/
+    http://www.ieat.ro/
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at:
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
