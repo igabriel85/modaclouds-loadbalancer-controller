@@ -16,6 +16,12 @@ It is important to note that it is only an early prototype. No guarantees are gi
 
 * v0.2-alpha - The generated haproxy config, pid files as well as the sqlite database is created in the folder denoted by $TMPDIR env varibale
 
+### Environmental Variables
+
+```
+It uses the $TMPDIR environmental variable to store temporary files for each launched instance.
+```
+
 ## Install
 
 These instructions were tested on Mac OS X Mavericks, openSuse 13.1 and Ubuntu 14.04. The main development machine was running Mac OS.
@@ -32,11 +38,7 @@ Requirements are pretty simple:
 * ** [git](http://git-scm.com/) (optional) **
 
 
-### Environmental Variables
 
-```
-It uses the $TMPDIR environmental variable to store temporary files for each launched instance.
-```
 
 In order to clone the repository create or go to a directory of your choosing and type:
 
