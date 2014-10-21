@@ -14,7 +14,7 @@ It is important to note that it is only an early prototype. No guarantees are gi
 
 ## Change Log
 
-* The generated haproxy config, pid files as well as the sqlite database is created in the folder denoted by $TMPDIR env varibale
+* v0.2-alpha - The generated haproxy config, pid files as well as the sqlite database is created in the folder denoted by $TMPDIR env varibale
 
 ## Install
 
@@ -30,6 +30,9 @@ Requirements are pretty simple:
 * ** [haproxy](http://www.haproxy.org/) **
 
 * ** [git](http://git-scm.com/) (optional) **
+
+
+### Environmental Variables
 
 ```
 It uses the $TMPDIR environmental variable to store temporary files for each launched instance.
