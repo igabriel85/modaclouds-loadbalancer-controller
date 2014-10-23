@@ -582,7 +582,7 @@ def getStPools():
 		poolList = []
 		for g in poolAll:
 			poolList.append(g.name)
-		response = jsonify({"Pools":poolList})
+		response = jsonify({"pools":poolList})
 		response.status_code = 200
 		return response
 	#return jsonify({'pools':['something', 'something']})
@@ -764,7 +764,7 @@ def getPTargets(pool):
 		targetList = []
 		for t in targetAll:
 			targetList.append(t.alias)
-		response = jsonify({"Targets":targetList})
+		response = jsonify({"targets":targetList})
 		response.status_code = 200
 		return response
 
@@ -787,7 +787,7 @@ def getTarget(pool,target):
 		return response
 	else:
 
-		response = jsonify({"Address":qTarget.entity_id,"weight":qTarget.weight,"enabled":qTarget.enabled})
+		response = jsonify({"address":qTarget.entity_id,"weight":qTarget.weight,"enabled":qTarget.enabled})
 		response.status_code = 200
 		return response
 		
