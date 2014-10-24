@@ -34,9 +34,6 @@ import jinja2
 import sys
 import socket
 import re
-
-# import tempfile
-# from shutil import copyfileobj
 import sqlite3, os
 import subprocess
 import signal
@@ -44,7 +41,6 @@ from subprocess import call
 from multiprocessing import Process
 import os.path
 import json
-#from flask.ext.moment import Moment
 from datetime import datetime
 from flask.ext.sqlalchemy import SQLAlchemy
 # generate temporary random named file
@@ -57,18 +53,21 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 template_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 #conf_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configuration')
 #pid_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)),'tmp')
+
+#get env $TMPDIR location
 tmp_loc = tempfile.gettempdir()
 #db_file = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-
 idGen = random.randint(0,900)
 portGen = '90'+str(random.randint(10,99))
+
+
 
 conf_name = '/haproxy'+str(idGen)+'.conf'
 pid_name = '/haproxy-'+str(idGen)+'.pid'
 
 
 
-# Need to create temporary file for pid use tempfile
+
 
 app = Flask('hrapy')
 
@@ -80,6 +79,8 @@ Uncoment if use from flask.ext.moment import Moment
 """
 Data Base Initialization
 """
+
+#moved to app create
 # app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///'+os.path.join(basedir,'test.db')
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 
@@ -231,7 +232,7 @@ Handle User break gracefully and killing Haproxy
 '''
 
 def signal_handler(signal, frame):
-	print'Killing Haproxy ...'
+	print'Stopping ...'
 	try:
 		pidf = open(tmp_loc+pid_name,"r").readline()
 		pidS = pidf.strip()
@@ -262,7 +263,7 @@ def getGateways():
 	response = jsonify({"Gateways":gatewayList})
 	response.status_code = 200
 	return response
-    #return "List gateways!!"
+    
 
 @app.route('/v1/gateways/<gateway>' ,methods=['GET'])
 def getGateway(gateway):
@@ -1313,9 +1314,9 @@ if __name__ == '__main__':
 	# db.create_all()
 	#checkOrf()  
 	if len(sys.argv) == 1:
-		app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///'+os.path.join(tmp_loc,'test.db')
+		app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///'+os.path.join(tmp_loc,'default.db')
 		db.create_all()
-		app.run(debug = True)
+		app.run(host='0.0.0.0', port=8088, debug = True)
 		signal.signal(signal.SIGINT, signal_handler)
 		signal.pause()
 	else:

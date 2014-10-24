@@ -49,6 +49,7 @@ defaults
 {% endfor %}
 
 
-listen haproxyapp_admin:{{listenPort}} *:{{listenPort}}
+listen stats 
   mode http
-  stats uri /status
+  bind *:{{listenPort}}
+  stats uri /__haproxy/dashboard

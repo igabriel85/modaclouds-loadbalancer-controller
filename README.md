@@ -15,6 +15,9 @@ It is important to note that it is only an early prototype. No guarantees are gi
 ## Change Log
 
 * v0.2-alpha - The generated haproxy config, pid files as well as the sqlite database is created in the folder denoted by $TMPDIR env varibale
+** now default ip is set to "0.0.0.0" on port "8088".
+** renamed default database to default.db instead of test.db
+** changed haproxy status URI from "/status" to "__haproxy/dashboard"
 
 ### Environmental Variables
 
@@ -177,8 +180,8 @@ create a new gateway (identified by the token {gateway}), or update an existing 
     },
     "pools":
     {
-    	"poolPutG1": "1.1.1.1:80",
-    	"poolPutG2": "1.1.1.2:80"
+      "poolPutG1": "1.1.1.1:80",
+      "poolPutG2": "1.1.1.2:80"
     },
   "enable": "True"
 }
@@ -199,8 +202,8 @@ Also it is possible to define the default pool (backend) for a given frontend (g
     },
     "pools":
     {
-    	"poolPutG1": "1.1.1.1:80",
-    	"poolPutG2": "1.1.1.2:80"
+      "poolPutG1": "1.1.1.1:80",
+      "poolPutG2": "1.1.1.2:80"
     },
   "enable": "True",
   "defaultBack":<backend_id>
@@ -583,7 +586,7 @@ When Haproxy starts pyHrapi responds with:
 The listenPort refers to Haproxy status interface which can be accessed at:
 
 ```
-<host>:<listenPort>/status
+<host>:<listenPort>/__haproxy/dashboard
 ```
 
 ##Note
