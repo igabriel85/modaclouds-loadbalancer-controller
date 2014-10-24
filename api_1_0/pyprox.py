@@ -155,7 +155,7 @@ class db_target(db.Model):
 	pool_id = db.Column(db.String, db.ForeignKey(db_pool.name))
 	alias = db.Column(db.String(64), unique=True)
 	entity_id = db.Column(db.String(64), unique=True)
-	weight = db.Column(db.String(64), unique=False, default = 0)
+	weight = db.Column(db.String(64), unique=False, default = 1)
 	enabled = db.Column(db.Boolean, unique=False, default = 1)
 	
 	
