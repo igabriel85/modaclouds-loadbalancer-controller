@@ -13,8 +13,12 @@ It is designed to:
 It is important to note that it is only an early prototype. No guarantees are given for its use. Furthermore it may be subject to significant changes from version to version.
 
 ## Change Log
+* v0.2.5-alpha
+** listen port check implemented
+** code refactoring 
 
-* v0.2-alpha - The generated haproxy config, pid files as well as the sqlite database is created in the folder denoted by $TMPDIR env varibale
+* v0.2-alpha 
+**The generated haproxy config, pid files as well as the sqlite database is created in the folder denoted by $TMPDIR env varibale
 ** now default ip is set to "0.0.0.0" on port "8088".
 ** renamed default database to default.db instead of test.db
 ** changed haproxy status URI from "/status" to "__haproxy/dashboard"
