@@ -70,7 +70,7 @@ def checkPID(pid):
 
 
 
-def signalHandler(signal, frame):
+def signalHandler(tmp_loc,pid_name):
 	'''
 	Handle User break gracefully and killing Haproxy
 	'''

@@ -58,7 +58,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 template_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 #conf_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configuration')
 #pid_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)),'tmp')
-tmp_loc = tempfile.gettempdir()
+
 #db_file = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
 #idGen = random.randint(0,900)
@@ -1245,6 +1245,7 @@ def dummy():
 
 
 if __name__ == '__main__':
+	tmp_loc = tempfile.gettempdir()
 	conf_name = checkFile('haproxy','conf',tmp_loc, 1)
 	pid_name = checkFile('haproxy','pid',tmp_loc, 1)
 
@@ -1252,7 +1253,7 @@ if __name__ == '__main__':
 		app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///'+os.path.join(tmp_loc,'default.db')
 		db.create_all()
 		app.run(host='0.0.0.0', port=8088, debug = True)
-		signal.signal(signal.SIGINT, signalHandler)
+		signal.signal(signal.SIGINT, signalHandler(tmp_loc,pid_name))
 		signal.pause()
 	else:
 		arList = sys.argv
@@ -1262,7 +1263,7 @@ if __name__ == '__main__':
 		app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///'+os.path.join(tmp_loc,dbname+'.db')
 		db.create_all()
 		app.run(host = host, port = port)
-		signal.signal(signal.SIGINT, signalHandler)
+		signal.signal(signal.SIGINT, signalHandler(tmp_loc,pid_name))
 		signal.pause()
 
 	
