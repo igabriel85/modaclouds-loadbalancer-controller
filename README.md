@@ -15,7 +15,8 @@ It is important to note that it is only an early prototype. No guarantees are gi
 ## Change Log
 * v0.2.5-alpha
  * listen port check implemented
- * code refactoring 
+ * code refactoring
+ * new resource added for dashboard haproxy 
 
 * v0.2-alpha 
  *The generated haproxy config, pid files as well as the sqlite database is created in the folder denoted by $TMPDIR env varibale
@@ -587,11 +588,17 @@ When Haproxy starts pyHrapi responds with:
 
 ```
 
-The listenPort refers to Haproxy status interface which can be accessed at:
+The listenPort refers to Haproxy dashboard which can be accessed at:
 
 ```
 <host>:<listenPort>/__haproxy/dashboard
 ```
+
+The resource at :
+```
+<host>:<port>/v1/controller/__haproxy/dashboard
+```
+will redirect given a GET request to the dashboard address listed above.
 
 ##Note
 
