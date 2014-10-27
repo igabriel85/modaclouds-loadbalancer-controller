@@ -34,6 +34,7 @@ import jinja2
 import sys
 import socket
 import re
+import urllib2
 
 # import tempfile
 # from shutil import copyfileobj
@@ -1055,6 +1056,21 @@ def reloadLB():
 		response.status_code = 200
 		return  response
 	
+@app.route('/v1/controller/__haproxy/dashboard',methods=['GET'])
+def haproxyDash():
+	addr = socket.gethostbyname(socket.gethostname())
+	dashURL = 'http://'+addr+':'+str(portGen)+'/__haproxy/dashboard'
+	req = urllib2.Request(dashURL)
+	try:
+		urllib2.urlopen(req)
+		#return "URL accesible"
+	except urllib2.URLError as e:
+		response = jsonify({"Dashboard status":"Offline"})
+		response.status_code = 404
+		return response
+
+	return redirect(dashURL)
+
 
 
 
