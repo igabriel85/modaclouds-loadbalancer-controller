@@ -59,7 +59,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 template_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 #conf_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configuration')
 #pid_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)),'tmp')
-
+host = '0.0.0.0'
 #db_file = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
 #idGen = random.randint(0,900)
@@ -1058,8 +1058,8 @@ def reloadLB():
 	
 @app.route('/v1/controller/__haproxy/dashboard',methods=['GET'])
 def haproxyDash():
-	addr = socket.gethostbyname(socket.gethostname())
-	dashURL = 'http://'+addr+':'+str(portGen)+'/__haproxy/dashboard'
+	#addr = socket.gethostbyname(socket.gethostname())
+	dashURL = 'http://'+host+':'+str(portGen)+'/__haproxy/dashboard'
 	req = urllib2.Request(dashURL)
 	try:
 		urllib2.urlopen(req)
