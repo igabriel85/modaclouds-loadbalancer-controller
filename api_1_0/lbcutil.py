@@ -44,10 +44,10 @@ def portScan(listenPort):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	sockTest = sock.connect_ex(('0.0.0.0',listenPort))
 	if sockTest == 0:
-		print "Port is not good:%s" % listenPort
+		#print "Port is not good:%s" % listenPort
 		return portScan(listenPort +1)
 	else:
-		print "Port %s is good!" % listenPort
+		#print "Port %s is good!" % listenPort
 		return listenPort
 
 

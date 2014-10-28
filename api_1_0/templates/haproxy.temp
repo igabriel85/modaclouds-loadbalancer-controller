@@ -27,6 +27,8 @@ defaults
       bind {{e}}
     {%endfor%}
       mode http
+      stats enable
+      stats uri /__haproxy/dashboard
       option httpclose
       option forwardfor
       reqadd X-Forwarded-Proto:\ https
