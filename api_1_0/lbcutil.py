@@ -22,6 +22,7 @@ import os.path
 import socket
 import sys
 import signal
+from subprocess import CalledProcessError, check_output, check_call,call
 
 
 
@@ -125,3 +126,36 @@ def checkOrf():
 	# else:
 	# 	haKill = Process(target=call, args=(('pkill','haproxy'), )).start()
 	# 	print "Killed haproxy"
+
+'''
+Parse PID file
+'''
+
+def parsePID(tmp_loc,pid_name):
+	try:
+		pidfile = open(tmp_loc+pid_name,"r").readline()
+		pidString = pidfile.strip()
+		pid = int(pidString)
+		return pid
+		#pidfile.readline()
+	except IOError: 
+		print "File does not exist."
+		#response = jsonify({"PID Error":"File did not exist"})
+		#response.status_code =201
+		bFile = open(tmp_loc+pid_name,'w')
+		bFile.write(str(0))
+		bFile.close()
+		return 0
+		#return response
+
+
+def checkConfig(tmp_loc,conf_name):
+	'''
+	Validate HAproxy config file.
+	'''
+	try:
+		output = check_call(["haproxy", "-f" ,tmp_loc+'/'+conf_name])
+		return 0
+	except CalledProcessError as e:
+		if e.returncode == 1:
+			return 1
