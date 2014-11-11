@@ -13,6 +13,11 @@ It is designed to:
 It is important to note that it is only an early prototype. No guarantees are given for its use. Furthermore it may be subject to significant changes from version to version.
 
 ## Change Log
+* v0.2.7-alpha
+  * added resources to upload security certificates
+  * added resources to upload haproxy configuration files
+    * use environmental variables for Enpoint IP, Enpoint port Min and Max, pid.
+    * for futher details see `GET` `/v1/haproxy/variables`
 * v0.2.5-alpha
  * listen port check implemented
  * code refactoring
@@ -599,6 +604,17 @@ The resource at :
 <host>:<port>/v1/controller/__haproxy/dashboard
 ```
 will redirect given a GET request to the dashboard address listed above.
+
+
+It is posible as of version v0.2.7-alpha to upload a configuration and pem certificate using REST calls.
+
+In order to upload certificates the content-type has to be application/x-pem-file.
+
+`PUT` `/v1/certificates/<cert>`
+
+The certificats will be saved in the sqlite3 database as well as in $TMPDIR under the name <cert>.pem .
+
+TODO - user guide
 
 ##Note
 
