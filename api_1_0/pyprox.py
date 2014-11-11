@@ -52,7 +52,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 import tempfile
 import random
 # util import
-from lbcutil import checkFile, portScan, checkPID, signalHandler,parsePID,checkConfig
+from lbcutil import checkFile, portScan, checkPID, signalHandler,parsePID,checkConfig,checkOrf
 from werkzeug import secure_filename
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -61,7 +61,6 @@ template_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templat
 #pid_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)),'tmp')
 host = '0.0.0.0'
 #db_file = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-
 #secure file upload
 UPLOAD_FOLDER = tempfile.gettempdir()+'/haConfUp'
 ALLOWED_EXTENSIONS = set(['txt','conf'])
@@ -1149,16 +1148,32 @@ Non-Generate configfile upload
 
 @app.route('/v1/haproxy/configuration/running',methods=['GET'])
 def configRunning():
-	return 'no variables expanded-> return config file no replace'
+	qr = db_upconf.query.filter_by(running = 1).first()
+	if qr is None:
+		response = jsonify({'error':'no running config'})
+		response.status_code = 404
+		return response
+
+	return qr.data
+	#return 'no variables expanded-> return config file no replace'
 
 @app.route('/v1/haproxy/configuration/running/expanded',methods=['GET'])
 def configRunningExpanded():
-	return 'return expanded config -> replace'
+	qer = db_upconf.query.filter_by(running = 1).first()
+	if qer is None:
+		response = jsonify({'error':'no running config'})
+		response.status_code = 404
+		return response
+
+	return qer.expanded
+
 
 @app.route('/v1/haproxy/configuration/pending', methods=['GET','PUT','DELETE'])
 def configPending():
 	if request.method == 'GET':
-		return 'print config pennding'
+		qp = db_upconf.query.filter_by(pending = 1).first()
+		response = qp.data
+		return response
 
 	if request.method == 'PUT':
 		if request.headers['Content-Type'] == 'text/plain':
@@ -1167,38 +1182,47 @@ def configPending():
 			temporaryConf.write(cData)
 			temporaryConf.close()
 			
-			inCfg = open(tmp_loc+'/temporary.conf')
-			
 
 			endpointIP = os.getenv('MODACLOUDS_LOAD_BALANCER_GATEWAY_ENDPOINT_IP', '0.0.0.0')
 			portMin = os.getenv('MODACLOUDS_LOAD_BALANCER_GATEWAY_ENDPOINT_PORT_MIN','8000')
 			portMax = os.getenv('MODACLOUDS_LOAD_BALANCER_GATEWAY_ENDPOINT_PORT_MAX','8080')
+
+
+			inCfg = open(tmp_loc+'/temporary.conf')
+			expandedTemp = open(tmp_loc+'/temporary-expanded.conf', 'w+')	
 
 			nrOfPorts = 0
 			for line in inCfg:
 				if '@{gateway:endpoint:port:' in line:
 					nrOfPorts +=1
 
-					
+			if nrOfPorts > 81:
+					response = jsonify({'error':'exceeded max allowed port range'})
+					response.status_code = 409
+					return response
+
+			inCfg.close()		
 			dictVar = {
 					'@{gateway:endpoint:ip}':endpointIP,
-					'@{certificates:store}':tmp_loc
+					'@{certificates:store}':tmp_loc,
+					'@{pid:store}':tmp_loc+'/tmp.pid'
 			}
 
 
-			for n in range(0,nrOfPorts+1):
-				dictVar.update({'@{gateway:enpoint:port:'+str(n): str(8000+n)})
+			for n in range(0,nrOfPorts):
+				gatewayEndpointPort = '@{gateway:endpoint:port:'+str(n)+'}'
+				dictVar.update({gatewayEndpointPort:str(8000+n)})
 
-			expandedTemp = open(tmp_loc+'/temporary-expanded.conf', 'w+')
-			
-			for line in inCfg:
+
+			temp = open(tmp_loc+'/temporary.conf')
+			for line in temp:
 				for src, target in dictVar.iteritems():
 					line = line.replace(src, target)
 				expandedTemp.write(line)
-			inCfg.close()
+			temp.close()
 			expandedTemp.close()
 
-			
+				
 
 			try:
 				if checkConfig(tmp_loc,'temporary-expanded.conf') == 1:
@@ -1215,14 +1239,23 @@ def configPending():
 				return response
 				
 
-			pendingFinal = open(tmp_loc+'/'+'pending.conf','r').read()	
+			pendingFinal = open(tmp_loc+'/'+'pending.conf','r').read()
+			#reset the last config to pending 0
+			qpending = db_upconf.query.filter_by(pending = 1).first()
+			if qpending is not None:
+				qpending.pending = 0
+				db.session.add(qpending) 
+				db.session.commit()
+
 			up = db_upconf(pending = 1,running = 0, schema = url_for('configPending') ,method = request.method, data = cData, expanded = pendingFinal)
 			db.session.add(up) 
 			db.session.commit()
 
 			
-				
-			return "Text Message: " + pendingFinal
+			response = jsonify({'updated':'pending'})
+			response.status_code = 200
+			return response	
+			#return "Text Message: " + pendingFinal
 		else:
 			abort(415)
 
@@ -1231,11 +1264,43 @@ def configPending():
 
 @app.route('/v1/haproxy/configuration/pending/expanded', methods = ['GET'])
 def configPendingExpanded():
-	return 'print expanded verion of pending config'
+	qp = db_upconf.query.filter_by(pending = 1).first()
+	response = qp.expanded
+	return response
 
+
+# NOT WORKING PENNDING RUNNING SWITCH
 @app.route('/v1/haproxy/configuration/commit', methods = ['POST'])
 def configLoad():
-	return 'replace running with pending without restarting'
+	queryRun = db_upconf.query.filter_by(running = 1).first()
+	
+	
+	queryPen = db_upconf.query.filter_by(pending = 1).first()
+	if queryPen is None:
+		response = jsonify({'exception':'no pending found'})
+		response.status_code = 404
+		return response
+	else:
+		queryPen.pending = 0
+		queryPen.running = 1
+		db.session.add(queryPen)
+		db.session.commit()
+
+	if queryRun is not None:
+		queryRun.running = 0
+		queryRun.pending = 1
+		db.session.add(queryRun) 
+		db.session.commit()
+
+	confData = queryRun.expanded
+	runningConf =  open(tmp_loc+'/running.conf',"w+")
+	runningConf.write(confData)
+	runningConf.close()
+
+	response = jsonify({'status':'pending is now running'})
+	response.status_code = 200
+	return response
+	
 
 @app.route('/v1/haproxy/configuration/variables', methods = ['GET'])
 def getConfigVariables():
@@ -1264,15 +1329,56 @@ def getConfigVariables():
 
 @app.route('/v1/haproxy/control/start',methods = ['POST'])
 def extHaStart():
-	return 'start'
+	try:
+		tempPid = open(tmp_loc+'/tmp.pid','r').readline()
+		testPidStrip = tempPid.strip()
+		pidTestInt = int(testPidStrip)
+	except IOError:
+		response = jsonify({'error':'pid temp'})
+		response.status_code = 500
+		return response
+
+	if checkPID(pidTestInt) == True:
+		response = jsonify({'exception':'haproxy already started'})
+		response.status_code = 409
+		return response
+	
+	procStart = subprocess.Popen(['haproxy', '-f', tmp_loc+'/running.conf'])	
+
+	response = jsonify({'haproxy status':'started','pid':procStart.pid})
+	response.status_code = 200
+	return response
+	
 
 @app.route('/v1/haproxy/control/stop',methods = ['POST'])
 def extHaStop():
-	return 'stop current haproxy'
+	checkOrf()
+	response = jsonify({'status':'haproxy killed'})
+	response.status_code = 200
+	return response
 
 @app.route('/v1/haproxy/control/restart', methods = ['POST'])
 def extHaRestart():
-	return 'restart current haproxy'
+	try:
+		tempPidRead = open(tmp_loc+'/tmp.pid','r').readline()
+		tempPidReadString = tempPidRead.strip()
+		pidInt = int(tempPidReadString)
+	except IOError:
+		response = jsonify({'error':'pid file not found'})
+		response.status_code = 404
+		return response
+
+	if checkPID(pidInt) == True:
+		procRestart = subprocess.Popen(['haproxy', '-f', tmp_loc+'/running.conf','-p',tmp_loc+'/tmp.pid','sf',tempPidReadString])
+		response = jsonify({'haproxy status':'restarted','pid':procRestart.pid})
+		response.status_code = 200
+		return response
+	else:
+		response = jsonify({'haproxy status':'no haproxy to restart'})
+		response.status_code = 404
+		return response
+
+	
 
 @app.route('/v1/certificates', methods = ['GET'])
 def getCertificates():
