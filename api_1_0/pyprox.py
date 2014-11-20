@@ -29,12 +29,14 @@ from flask import url_for
 from flask import render_template
 from flask import Response
 from flask import send_file
+from flask import send_from_directory
 from sqlalchemy import desc
 import jinja2
 import sys
 import socket
 import re
 import urllib2
+import urllib
 
 # import tempfile
 # from shutil import copyfileobj
@@ -879,7 +881,7 @@ def exportCDB():
 @app.route('/v1/controller/_export-sql', methods=['GET'])
 def exportSQL():
 	try:
-		dbDump = open(basedir+'/test.db','rb')
+		dbDump = open(tmp_loc+'/default.db','rb')
 		
 		return send_file(dbDump,mimetype = 'application/x-sqlite2',as_attachment = True)
 		# dbCon = sqlite3.connect(basedir+'/test.db')
@@ -917,7 +919,7 @@ def importSQL():
 		response.status_code = 400
 		return response
 
-	dbImp =  open(basedir+"/imp.db","w+")
+	dbImp =  open(tmp_loc+"/imp.db","w+")
 	dbImp.write(request.data)
 	dbImp.close()
 
@@ -1265,11 +1267,14 @@ def configPending():
 @app.route('/v1/haproxy/configuration/pending/expanded', methods = ['GET'])
 def configPendingExpanded():
 	qp = db_upconf.query.filter_by(pending = 1).first()
+	if qp is None:
+		response = jsonify({'error':'no pending configuration'})
+		response.status_code = 404
+		return response
 	response = qp.expanded
 	return response
 
 
-# NOT WORKING PENNDING RUNNING SWITCH
 @app.route('/v1/haproxy/configuration/commit', methods = ['POST'])
 def configLoad():
 	queryRun = db_upconf.query.filter_by(running = 1).first()
@@ -1316,15 +1321,15 @@ def getConfigVariables():
 	response.status_code = 200
 	return response
 
-	dictVar = {
-            "gateway:endpoint:ip" : "x.y.z.w", #MODACLOUDS_LOAD_BALANCER_GATEWAY_ENDPOINT_IP
-            "gateway:endpoint:port:min" : 8000, #MODACLOUDS_LOAD_BALANCER_GATEWAY_ENDPOINT_PORT_MIN
-            "gateway:endpoint:port:max" : 8080, #MODACLOUDS_LOAD_BALANCER_GATEWAY_ENDPOINT_PORT_MAX
-            "gateway:endpoint:port:0" : 8000,
-            "gateway:endpoint:port:7" : 8007,
-            "certificates:store" : "/.../"
-        }
-	return 'return json' + dictVar
+	# dictVar = {
+ #            "gateway:endpoint:ip" : "x.y.z.w", #MODACLOUDS_LOAD_BALANCER_GATEWAY_ENDPOINT_IP
+ #            "gateway:endpoint:port:min" : 8000, #MODACLOUDS_LOAD_BALANCER_GATEWAY_ENDPOINT_PORT_MIN
+ #            "gateway:endpoint:port:max" : 8080, #MODACLOUDS_LOAD_BALANCER_GATEWAY_ENDPOINT_PORT_MAX
+ #            "gateway:endpoint:port:0" : 8000,
+ #            "gateway:endpoint:port:7" : 8007,
+ #            "certificates:store" : "/.../"
+ #        }
+	#return 'return json' + dictVar
 
 
 @app.route('/v1/haproxy/control/start',methods = ['POST'])
@@ -1431,7 +1436,104 @@ def putCertificate(cert):
 			response = jsonify ({'deleted cert':cert})
 			response.status_code = 200
 			return response
+
+
+'''
+Integration with object store and artifact repository
+'''
+
+@app.route('/v1/controller/backup/<db_name>', methods= ['GET','POST','DELETE'])
+def controlBackupDB(db_name):
+	artifactRepoIP = os.getenv('MOSAIC_ARTIFACT_REPOSITORY_ENDPOINT_IP', '172.16.93.132')
+	artifactRepoPort = os.getenv('MOSAIC_ARTIFACT_REPOSITORY_ENDPOINT_PORT', '8888')
+
+	if request.method == 'POST':
+		dbFilePath = tmp_loc+'/'+db_name+'.db'
+		if os.path.isfile(dbFilePath) is True:
+			currentVer = 1
+			createArtifactLoc = artifactRepoIP+':'+artifactRepoPort+'/v1/repositories/mlbc/artifacts/'+db_name
 			
+			checkVersion = subprocess.Popen(['curl','-X','GET', 'http://'+createArtifactLoc],stdout=subprocess.PIPE)
+			artCreate=checkVersion.stdout	
+			respCreate = str(artCreate.read())
+			returnCode = json.loads(respCreate)
+			testCode = returnCode['data']
+			if not testCode:
+				pass
+			else:
+				testCode.sort()
+				lastVer = testCode.pop()
+				currentVer = int(lastVer)+1
+
+			createArtifact = subprocess.Popen(['curl','-X','PUT', 'http://'+createArtifactLoc+'/'+str(currentVer)],stdout=subprocess.PIPE)
+			checkStatusCreate = createArtifact.stdout
+			statusCreate = (checkStatusCreate.read())
+			artifactCodeJ = json.loads(statusCreate)
+			artifactCode = artifactCodeJ['code']
+			if artifactCode == 1:
+				response = jsonify({'error':'while creating artifact version'})
+				response.status_code = 405
+				return response
+
+			sendTo = artifactRepoIP+':'+artifactRepoPort+'/v1/repositories/mlbc/artifacts/'+db_name+'/'+str(currentVer)+'/files/'+db_name+'.db'
+			upDB = subprocess.Popen(['curl', '-i','-L','-X','PUT','-T', tmp_loc+'/'+db_name+'.db', 'http://'+sendTo],stdout=subprocess.PIPE)
+			checkupDBStatus = upDB.stdout
+			# statusUpDB = checkupDBStatus.read()
+			# statusCodeUpDBJ = json.loads(statusUpDB)
+			# statusCodeUpDB = statusCodeUpDBJ['code']
+			# if statusCodeUpDB == 1:
+			# 	response = jsonify({'error':'saving databse'})
+			# 	response.status_code = 501
+			# 	return response
+
+			response = jsonify({'success':'uploaded '+db_name+'.db'})
+			response.status_code = 200
+			return response
+			#return send_from_directory(tmp_loc,db_name+'.db',as_attachment = True)
+		else:
+			dbList = []
+			for dbFile in os.listdir(tmp_loc):
+				if dbFile.endswith(".db"):
+					dbList.append(dbFile)
+			response = jsonify({'error':'wrong name or db not found','db list':dbList})
+			response.status_code = 404
+			return response
+@app.route('/v1/controller/restore/<db_name>/<version>', methods = ['GET'])
+def  restoreDB(db_name,version):
+	# FIXME: to be moved to global position
+	artifactRepoIP = os.getenv('MOSAIC_ARTIFACT_REPOSITORY_ENDPOINT_IP', '172.16.93.132')
+	artifactRepoPort = os.getenv('MOSAIC_ARTIFACT_REPOSITORY_ENDPOINT_PORT', '8888')
+	#curl -X GET http://ENDPOINT_IP:ENDPOINT_PORT/v1/repositories/<repository>/artifacts/<artifact>/<version>/files/<file>
+	#srestore = subprocess.Popen(['curl','-X','GET','http://'+artifactRepoIP+':'+''])
+	arUrl = 'http://'+artifactRepoIP+':'+artifactRepoPort+'/v1/repositories/mlbc/artifacts/'+db_name+'/'+version+'/files/'+db_name+'.db'
+	f = urllib2.urlopen(arUrl)
+	data = f.read()
+	try:
+		with open(tmp_loc+'/'+db_name+'.db', "wb") as restoredDB:
+			restoredDB.write(data)
+			response = jsonify({'success':'restored database'})
+			response.status_code = 200
+			return response
+	except IOError:
+		response = jsonify({'error':'os file restore fail'})
+		response.status_code = 500
+		return response
+
+@app.route('/v1/controller/backup/config', methods = ['GET','POST','DELETE'])
+def controlBackupConf():
+	objecStoreIP = os.getenv('MOSAIC_OBJECT_STORE_ENDPOINT_IP', '0.0.0.0')
+	objectStorePort = os.getenv('MOSAIC_OBJECT_STORE_ENDPOINT_PORT', '9020')
+	if request.method == 'POST':
+		#query last commit and return the data 
+		qComm = db_commit.query.order_by(desc(db_commit.id)).first()
+		return str(qComm.data)
+
+	if request.method == 'GET':
+		return 'get backup config and start it'
+
+	if request.method == 'DELETE':
+		return 'delete last backup ????'
+
 
 """
 Custom errot Handling

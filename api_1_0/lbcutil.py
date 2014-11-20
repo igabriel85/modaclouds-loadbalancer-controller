@@ -160,3 +160,4 @@ def checkConfig(tmp_loc,conf_name):
 	except CalledProcessError as e:
 		if e.returncode == 1:
 			return 1
+
