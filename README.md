@@ -537,10 +537,43 @@ A new certificate will be added with the name given in <cert>. The content type 
 
 In order to delete a certificate we need to specify its name via <cert>.
 
+In order to specify the usage of a certificate we must specify the name of the certificate. This will tell the haproxy what certificate to use for a given gateway:
+
+```
+      <ip-address>:<port> crt ssl @{TMP}/<name>.pem
+
+```
+
+
+It is possible to upload a manually created configuration file. However, this is not recomended!
+
+`POST` `/v1/controller/upload`
+
+This allows a haproxy config file to be uploaded. If there is a running instance of haproxy it will be overwritten if not a new instance will be created.
+
+We can also see the current running and pending configuration. When a configuration is commited it is flagged as running and the old configuration is marked as pending.
+
+`GET` `/v1/haproxy/configuration/running`
+
+Displays the current running confuration by name. In order to see the expanded configuration please use:
+
+`GET` `/v1/haproxy/configuration/running/expanded`
+
+The same is true for pennding. Just replace running with pending in the above resource
+
+We can upload and flag a configuration as pending by:
+
+`PUT` `/v1/haproxy/configuration/pending`
+
+The content type should be set to `text/plain`.
+
+
+
+
 
 ## Artifact repository Integration
 
-The modaclouds-loadbalancer-controller (pyHrapy) is integrated with the Modaclouds [artifact repository](https://github.com/ieat/mosaic-artifact-repository). Using some simple REST calls we can store and retrieve the main sqlite database that stores all relevant information necesary for the setup of the loadbalancer.
+The modaclouds-loadbalancer-controller (pyHrapy) is integrated with the Modaclouds [artifact repository](https://github.com/ieat/mosaic-artifact-repository). Using some simple REST calls we can store and retrieve the main sqlite database that stores all relevant information necessary for the loadbalancer setup.
 
 
 `POST` `/v1/controller/backup/<db_name>`
@@ -552,6 +585,10 @@ This will back up the current database named <db_name>. It automatically increme
 It restores a specific version (specified by <db_name>) of the database.
 
 The config files have to be manually regenerated each time the database is restored. It will not effect any running instances of Haproxy
+
+
+
+
 
 # Getting Started - Example
 
