@@ -502,6 +502,56 @@ Imports an sql database and loads that as the default. The request data is the d
 Currently not implemented. Scheduled for the next version.
    
 
+It is posible as of version v0.2.7-alpha to upload a configuration and pem certificate using REST calls.
+
+In order to upload certificates the content-type has to be application/x-pem-file.
+
+`PUT` `/v1/certificates/<cert>`
+
+The certificats will be saved in the sqlite3 database as well as in $TMPDIR under the name <cert>.pem .
+
+`GET` `/v1/certificates`
+
+This returns a list containing all certificates currently stored:
+
+```json
+
+{
+    "certificates":[<certificate list>]
+}
+
+```
+
+`PUT` `/v1/certificates/<cert>`
+
+A new certificate will be added with the name given in <cert>. The content type should be set to `application/x-pem-file`. If everything is correct the call returns:
+
+```json
+{
+"certificate saved":<cert>.pem
+}
+
+```
+
+`DELETE` `/v1/certificates/<cert>`
+
+In order to delete a certificate we need to specify its name via <cert>.
+
+
+## Artifact repository Integration
+
+The modaclouds-loadbalancer-controller (pyHrapy) is integrated with the Modaclouds [artifact repository](https://github.com/ieat/mosaic-artifact-repository). Using some simple REST calls we can store and retrieve the main sqlite database that stores all relevant information necesary for the setup of the loadbalancer.
+
+
+`POST` `/v1/controller/backup/<db_name>`
+
+This will back up the current database named <db_name>. It automatically increments the the version after each commit.
+
+`GET` `/v1/controller/restore/<db_name>/<version>`
+
+It restores a specific version (specified by <db_name>) of the database.
+
+The config files have to be manually regenerated each time the database is restored. It will not effect any running instances of Haproxy
 
 # Getting Started - Example
 
@@ -606,15 +656,7 @@ The resource at :
 will redirect given a GET request to the dashboard address listed above.
 
 
-It is posible as of version v0.2.7-alpha to upload a configuration and pem certificate using REST calls.
 
-In order to upload certificates the content-type has to be application/x-pem-file.
-
-`PUT` `/v1/certificates/<cert>`
-
-The certificats will be saved in the sqlite3 database as well as in $TMPDIR under the name <cert>.pem .
-
-TODO - user guide
 
 ##Note
 
