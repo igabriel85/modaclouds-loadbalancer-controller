@@ -426,12 +426,25 @@ def putEndpoint(gateway, endpoint1):
 	if not request.json or not 'address' in request.json:
 		abort(400)
 
+	certAdr = request.json['address']
+	certificateLocation = ''
+	if '@' in certAdr:
+		lhs,rhs = certAdr.split('@',1)
+		certAdr = '/'.join([tmp_loc,rhs])
+		if os.path.exists(certAdr):
+			certAdr = lhs +" ssl crt " +certAdr
+			pass
+		else:
+			response =jsonify({"certificate error":"no such certificate"})
+			response.status_code = 404
+			return response
+
 	endpointQuery = db_endpoints.query.filter_by(alias=endpoint1).first()
 	if endpointQuery is None:
-		e = db_endpoints(revision = 1, alias = endpoint1, entity_id =request.json['address'], gateway_id = gateway, schema = url_for('putEndpoint', gateway = gateway, endpoint1 = endpoint1), data = request.data )
+		e = db_endpoints(revision = 1, alias = endpoint1, entity_id =certAdr, gateway_id = gateway, schema = url_for('putEndpoint', gateway = gateway, endpoint1 = endpoint1), data = request.data )
 		db.session.add(e)
 		db.session.commit()
-		response = jsonify({"Added Endpoint":endpoint1})
+		response = jsonify({"added endpoint":endpoint1})
 		response.status_code = 200
 		return response
 	else:
@@ -439,7 +452,7 @@ def putEndpoint(gateway, endpoint1):
 		endpointQuery.revision = int(rev) + 1
 		# add code for modification
 		endpointQuery.data = request.data
-		endpointQuery.entity_id = request.json['address']
+		endpointQuery.entity_id = certAdr
 		db.session.add(endpointQuery) 
 		db.session.commit()
 		response = jsonify({'Modified':endpoint1})

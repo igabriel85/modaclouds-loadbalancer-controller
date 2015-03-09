@@ -13,6 +13,10 @@ It is designed to:
 It is important to note that it is only an early prototype. No guarantees are given for its use. Furthermore it may be subject to significant changes from version to version.
 
 ## Change Log
+* v0.2.8-beta
+  * fixed support for security certificates in gateway endpoints
+  * updated documentation
+
 * v0.2.7-alpha
   * added resources to upload security certificates
   * added resources to upload haproxy configuration files
@@ -537,15 +541,23 @@ A new certificate will be added with the name given in <cert>. The content type 
 
 In order to delete a certificate we need to specify its name via <cert>.
 
-In order to specify the usage of a certificate we must specify the name of the certificate. This will tell the haproxy what certificate to use for a given gateway:
+In order to specify the usage of a certificate we must specify the name of the certificate. This will tell the haproxy what certificate to use for a given gateways endpoint:
+
+`PUT` `/v1/gateways/<gateway>/endpoints/<endpoint>`
+
+```json
+
+{
+    "address": "*:8081 @key.pem"
+}
 
 ```
-      <ip-address>:<port> crt ssl @{TMP}/<name>.pem
-
-```
+The `@` symbol denotes the name of the key to be used. If it is left out then the generated config file will not use certificate based authentication.
 
 
-It is possible to upload a manually created configuration file. However, this is not recomended!
+###Note
+
+It is possible to upload a manually created configuration file. However, this is not recomended! It is in very early development phase, it can cause undesired effects.
 
 `POST` `/v1/controller/upload`
 
@@ -565,7 +577,42 @@ We can upload and flag a configuration as pending by:
 
 `PUT` `/v1/haproxy/configuration/pending`
 
-The content type should be set to `text/plain`.
+The content type should be set to `text/plain` for the uploaded configuration file. This should contain certain variables such as:
+
+```
+global
+   ...
+
+frontend
+
+   bind @{gateway:endpoint:ip}:@{gateway:endpoint:port:0}
+   bind @{gateway:endpoint:ip}:@{gateway:endpoint:port:1} ssl crt
+@{certificates:store}/domain-1.pem
+
+   acl ...
+
+```
+
+
+By accessing the resource at:
+
+`GET` `/v1/haproxy/configuration/variables`
+
+, we get the following JSON containing the variables that are currently set as endpoint IP and port range, as well as the location of the stored certificates:
+
+``` json
+{
+  "gateway:endpoint:ip" : <endpointIP>,
+  "gateway:endpoint:port:min" : <portMin>, 
+  "gateway:endpoint:port:max" : <portMax>, 
+  "certificates:store" : <tmp_loc>
+
+}
+```
+
+In order to start/restart/stop the uploaded certificates we can use:
+
+`POST` `/v1/haproxy/control/<start/restart/stop>`
 
 
 
