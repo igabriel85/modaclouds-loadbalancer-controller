@@ -557,11 +557,11 @@ The `@` symbol denotes the name of the key to be used. If it is left out then th
 
 ###Note
 
-It is possible to upload a manually created configuration file. However, this is not recomended! It is in very early development phase, it can cause undesired effects.
+It is possible to upload a manually created configuration file. However, this is not recommended! It is in very early development phase, it can cause undesired effects.
 
 `POST` `/v1/controller/upload`
 
-This allows a haproxy config file to be uploaded. If there is a running instance of haproxy it will be overwritten if not a new instance will be created.
+This allows a haproxy config file to be uploaded. If there is a running instance of haproxy it will be overwritten if not a new instance will be created. Although this is functional at the moment it is marked for deprecation for the next stable release.
 
 We can also see the current running and pending configuration. When a configuration is commited it is flagged as running and the old configuration is marked as pending.
 

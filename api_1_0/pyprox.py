@@ -1511,6 +1511,7 @@ def controlBackupDB(db_name):
 			response = jsonify({'error':'wrong name or db not found','db list':dbList})
 			response.status_code = 404
 			return response
+			
 @app.route('/v1/controller/restore/<db_name>/<version>', methods = ['GET'])
 def  restoreDB(db_name,version):
 	# FIXME: to be moved to global position
