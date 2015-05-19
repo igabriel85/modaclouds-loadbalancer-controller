@@ -1,6 +1,7 @@
 global
   daemon
   maxconn 4096
+  tune.ssl.default-dh-param 2048
   pidfile {{pid}}
 
 
@@ -27,7 +28,6 @@ defaults
       bind {{e}}
     {%endfor%}
       mode http
-      stats enable
       stats uri /__haproxy/dashboard
       option httpclose
       option forwardfor
@@ -51,7 +51,7 @@ defaults
 {% endfor %}
 
 
-listen stats 
+listen stats
   mode http
   bind *:{{listenPort}}
   stats uri /__haproxy/dashboard
